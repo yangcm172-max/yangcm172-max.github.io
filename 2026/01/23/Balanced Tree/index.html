@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 8.1.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yangcm172-max.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="绕远的路，总有风景。  引子：二叉查找树 也称为二叉搜索树。 大部分平衡树数据结构都是基于二叉查找树实现的，故在此进行讲述。 见名知义，首先这是一种二叉树，并且十分易于查找元素。 其实就是说，对于二叉查找树的每一个节点，都有左子节点的权值小于她的权值，右子节点的权值大于她的权值（当然是在左&#x2F;右子树不为空的情况下），随机构造一棵二叉查找树的数学期望高度为 O(log⁡n)\mathcal{O}(\">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Balanced Tree">
+<meta property="og:url" content="https://yangcm172-max.github.io/2026/01/23/Balanced%20Tree/index.html">
+<meta property="og:site_name" content="yang_cm&#39;s Blog">
+<meta property="og:description" content="绕远的路，总有风景。  引子：二叉查找树 也称为二叉搜索树。 大部分平衡树数据结构都是基于二叉查找树实现的，故在此进行讲述。 见名知义，首先这是一种二叉树，并且十分易于查找元素。 其实就是说，对于二叉查找树的每一个节点，都有左子节点的权值小于她的权值，右子节点的权值大于她的权值（当然是在左&#x2F;右子树不为空的情况下），随机构造一棵二叉查找树的数学期望高度为 O(log⁡n)\mathcal{O}(\">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://oi-wiki.org/ds/images/treap-treap-example.svg">
+<meta property="og:image" content="https://cdn.luogu.com.cn/upload/pic/44303.png">
+<meta property="article:published_time" content="2026-01-23T11:09:24.000Z">
+<meta property="article:modified_time" content="2026-01-23T13:39:15.768Z">
+<meta property="article:author" content="yang_cm">
+<meta property="article:tag" content="平衡树">
+<meta property="article:tag" content="笔记">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://oi-wiki.org/ds/images/treap-treap-example.svg">
+
+<link rel="canonical" href="https://yangcm172-max.github.io/2026/01/23/Balanced%20Tree/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Balanced Tree | yang_cm's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">yang_cm's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">瞻彼洛矣、維水泱泱</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="https://yangcm172-max.github.io/2026/01/23/Balanced%20Tree/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="yang_cm">
+      <meta itemprop="description" content="Some note for OI">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="yang_cm's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Balanced Tree
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2026-01-23 19:09:24 / Modified: 21:39:15" itemprop="dateCreated datePublished" datetime="2026-01-23T19:09:24+08:00">2026-01-23</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/article/wzo79xcy">绕远的路，总有风景。</a></p>
+</blockquote>
+<h3 id="引子：二叉查找树">引子：二叉查找树</h3>
+<p>也称为二叉搜索树。</p>
+<p>大部分平衡树数据结构都是基于二叉查找树实现的，故在此进行讲述。</p>
+<p>见名知义，首先这是一种二叉树，并且十分易于查找元素。</p>
+<p>其实就是说，对于二叉查找树的每一个节点，都有左子节点的权值小于她的权值，右子节点的权值大于她的权值（当然是在左/右子树不为空的情况下），随机构造一棵二叉查找树的数学期望高度为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">O</mi><mo stretchy="false">(</mo><mi>log</mi><mo>⁡</mo><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathcal{O}(\log n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>，其中 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 为元素个数。</p>
+<p>我们放上二叉查找树的节点实现：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">Node</span> &#123;</span><br><span class="line">	<span class="type">int</span> val; <span class="comment">// 点权</span></span><br><span class="line">  	<span class="type">int</span> sz; <span class="comment">// 子树大小</span></span><br><span class="line">    <span class="type">int</span> cnt; <span class="comment">// 权值的重复数量</span></span><br><span class="line">    <span class="type">int</span> ch[<span class="number">2</span>]; <span class="comment">// 两个子节点</span></span><br><span class="line">    </span><br><span class="line">	<span class="function"><span class="type">void</span> <span class="title">init</span><span class="params">(<span class="type">int</span> v)</span> </span>&#123;</span><br><span class="line">        val = v;</span><br><span class="line">        sz = <span class="number">1</span>;</span><br><span class="line">        cnt = <span class="number">1</span>;</span><br><span class="line">        ch[<span class="number">0</span>] = ch[<span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>而二叉查找树在平衡树中的应用一般被要求 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>5</mn></mrow><annotation encoding="application/x-tex">5</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">5</span></span></span></span> 个操作：插入（insert）、删除（remove）、查询排名（rank）、查询数值（K-th）、前驱/后继（prev/next），下面我们一一讲解（下文分析时间复杂度中的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi></mrow><annotation encoding="application/x-tex">h</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">h</span></span></span></span> 表示树高）。</p>
+<h4 id="插入（insert）">插入（insert）</h4>
+<p>我们按照 BST（二叉查找树的英文缩写）的规则找到节点即可，若已经存在则 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mi>n</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">cnt</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">c</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span></span></span></span> 加 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn></mrow><annotation encoding="application/x-tex">1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">insert</span><span class="params">(<span class="type">int</span> &amp;x, <span class="type">int</span> v)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!x) &#123; <span class="comment">// 不存在节点</span></span><br><span class="line">        x = ++ tot; <span class="comment">// 新建节点</span></span><br><span class="line">        tree[x].<span class="built_in">init</span>(v); <span class="comment">// 别忘了初始化节点</span></span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    tree[x].sz ++; <span class="comment">// 一定要加了</span></span><br><span class="line">    <span class="keyword">if</span> (tree[x].val == v) &#123; <span class="comment">// 节点已经存在</span></span><br><span class="line">        tree[x].cnt ++; <span class="comment">// 权值为val的数又多了一个</span></span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">int</span> dir = (v &gt; tree[x].val); <span class="comment">// 大于当前点的权值就是右子节点，否则为左子节点</span></span><br><span class="line">    <span class="built_in">insert</span>(tree[x].ch[dir], v);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>时间复杂度 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">O</mi><mo stretchy="false">(</mo><mi>h</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathcal{O}(h)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">h</span><span class="mclose">)</span></span></span></span>。尽管 <code>push_up</code> 的操作大家应该都会实现，但是为了完整性我们这里也给出代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">push_up</span><span class="params">(<span class="type">int</span> id)</span> </span>&#123;tree[id].sz = tree[tree[id].ch[<span class="number">0</span>]].sz + tree[tree[id].ch[<span class="number">1</span>]].sz + tree[id].cnt;&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="删除（remove）">删除（remove）</h4>
+<p>最复杂的操作。</p>
+<p>首先找到权值为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>v</mi></mrow><annotation encoding="application/x-tex">v</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span></span></span></span> 的节点，这里默认节点已经存在。</p>
+<p>若该节点的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mi>n</mi><mi>t</mi><mo>&gt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">cnt&gt;1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6542em;vertical-align:-0.0391em;"></span><span class="mord mathnormal">c</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>，直接 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mi>n</mi><mi>t</mi><mo>←</mo><mi>c</mi><mi>n</mi><mi>t</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">cnt\leftarrow cnt - 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">c</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">←</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6984em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">c</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 即可。</p>
+<p>如果 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mi>n</mi><mi>t</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">cnt = 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">c</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>，分以下三种情况：</p>
+<ul>
+<li>若该节点为叶子节点（没有儿子），直接删掉。</li>
+<li>若该节点只有一个儿子，删掉并将她的儿子接到她的父亲上。</li>
+<li>若该节点有两个儿子，删掉并将她 左子树的最大权值节点/右子树的最小权值节点 接到她的父亲上，因为这个接替的节点完全符合 BST 的性质，完美维护。</li>
+</ul>
+<p>时间复杂度 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">O</mi><mo stretchy="false">(</mo><mi>h</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathcal{O}(h)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">h</span><span class="mclose">)</span></span></span></span>。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">remove</span><span class="params">(<span class="type">int</span> &amp;x, <span class="type">int</span> v)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!x) <span class="keyword">return</span>;</span><br><span class="line">    <span class="keyword">if</span> (tree[x].val == v) &#123;</span><br><span class="line">        <span class="keyword">if</span> (tree[x].cnt &gt; <span class="number">1</span>) &#123;</span><br><span class="line">            tree[x].cnt -- ; <span class="comment">// 直接减</span></span><br><span class="line">            tree[x].sz --;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (!tree[x].ch[<span class="number">0</span>] || !tree[x].ch[<span class="number">1</span>]) &#123; <span class="comment">// 单儿子</span></span><br><span class="line">            x = tree[x].ch[<span class="number">0</span>] + tree[x].ch[<span class="number">1</span>]; <span class="comment">// 雅</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="type">int</span> s = tree[x].ch[<span class="number">1</span>];</span><br><span class="line">            <span class="keyword">while</span> (tree[s].ch[<span class="number">0</span>]) s = tree[s].ch[<span class="number">0</span>];</span><br><span class="line">            tree[x].val = tree[s].val; <span class="comment">// 细节复制</span></span><br><span class="line">            tree[x].cnt = tree[s].cnt;</span><br><span class="line">            tree[s].cnt = <span class="number">1</span>; <span class="comment">// 一会递归删的时候就方便了</span></span><br><span class="line">            <span class="built_in">remove</span>(tree[x].ch[<span class="number">1</span>], tree[s].val);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="built_in">remove</span>(tree[x].ch[v &gt; tree[x].val], v);</span><br><span class="line">    <span class="keyword">if</span>(x) <span class="built_in">push_up</span>(x); <span class="comment">// 警惕：可能x已经不存在了</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但是因为当 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mi>n</mi><mi>t</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">cnt=1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">c</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 的时候情况有些复杂，为了<s>偷懒</s>更快地进行写代码，我们也可以通过假删除的方式进行删除，就是把 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mi>n</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">cnt</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">c</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span></span></span></span> 减到 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn></mrow><annotation encoding="application/x-tex">0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>，然后特判即可。</p>
+<p>但是不建议。</p>
+<h4 id="查询排名（rank）">查询排名（rank）</h4>
+<p>排名定义为将数组元素升序排序后第一个相同元素之前的数的个数加一，就跟你 whk 年级排名的逻辑是一样的，同分同排名。</p>
+<p>在查询元素的过程中，若跳往右子节点，加上左子树的大小和当前点的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mi>n</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">cnt</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">c</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span></span></span></span>，最后答案加上终点的左子树大小加一。</p>
+<p>时间复杂度 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">O</mi><mo stretchy="false">(</mo><mi>h</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathcal{O}(h)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">h</span><span class="mclose">)</span></span></span></span>。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">queryRank</span><span class="params">(<span class="type">int</span> &amp;x, <span class="type">int</span> v)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!x) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span> (tree[x].val == v) <span class="keyword">return</span> (tree[x].ch[<span class="number">0</span>] ? tree[tree[x].ch[<span class="number">0</span>]].sz : <span class="number">0</span>) + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span> (v &lt; tree[x].val) <span class="keyword">return</span> <span class="built_in">queryRank</span>(tree[x].ch[<span class="number">0</span>], v);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">return</span> <span class="built_in">queryRank</span>(tree[x].ch[<span class="number">1</span>], v) +</span><br><span class="line">      (tree[x].ch[<span class="number">0</span>] ? tree[tree[x].ch[<span class="number">0</span>]].sz : <span class="number">0</span>) + tree[x].cnt;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="查询数值（K-th）">查询数值（K-th）</h4>
+<p>假设现在递归到了某节点。</p>
+<ul>
+<li>若左子树的大小大于等于 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span></span></span></span>，则查询数值在左子树中。</li>
+<li>若左子树的大小属于区间 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mi>k</mi><mo>−</mo><mi>c</mi><mi>n</mi><mi>t</mi><mo separator="true">,</mo><mi>k</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[k-cnt,k-1]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">c</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">]</span></span></span></span>（其中 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mi>n</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">cnt</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">c</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span></span></span></span> 为当前节点的），则查询数值就是当前节点。</li>
+<li>若左子树的大小小于 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>−</mo><mi>c</mi><mi>n</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">k-cnt</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">c</span><span class="mord mathnormal">n</span><span class="mord mathnormal">t</span></span></span></span>，则查询数值在右子树中。</li>
+</ul>
+<p>时间复杂度 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">O</mi><mo stretchy="false">(</mo><mi>h</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathcal{O}(h)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">h</span><span class="mclose">)</span></span></span></span>。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">int</span> <span class="title">queryKth</span><span class="params">(<span class="type">int</span> &amp;x, <span class="type">int</span> k)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!x) <span class="keyword">return</span> <span class="number">-1</span>; <span class="comment">// 取决于什么不属于值域（可以表示没有）</span></span><br><span class="line">    <span class="type">int</span> lsz = (tree[x].ch[<span class="number">0</span>] ? tree[tree[x].ch[<span class="number">0</span>]].sz : <span class="number">0</span>); <span class="comment">// 左子树大小</span></span><br><span class="line">    <span class="keyword">if</span> (k &lt;= lsz) <span class="keyword">return</span> <span class="built_in">queryKth</span>(tree[x].ch[<span class="number">0</span>], k); <span class="comment">// 左子树</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (k &lt;= lsz + tree[x].cnt) <span class="keyword">return</span> tree[x].val; <span class="comment">// 找到了！</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">return</span> <span class="built_in">queryKth</span>(tree[x].ch[<span class="number">1</span>], k - lsz - tree[x].cnt); <span class="comment">// 右子树</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="前驱-后继（prev-next）">前驱/后继（prev/next）</h4>
+<p>我们完全可以直接使用刚才的 find rank 和 find K-th 的函数实现查找前驱/后继。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> pre = <span class="built_in">queryKth</span>(root, <span class="built_in">queryRank</span>(root, v) - <span class="number">1</span>); <span class="comment">// 前驱</span></span><br><span class="line"><span class="type">int</span> nxt = <span class="built_in">queryKth</span>(root, <span class="built_in">queryRank</span>(root, v + <span class="number">1</span>)); <span class="comment">// 后继</span></span><br></pre></td></tr></table></figure>
+<p>复杂度自然就是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">O</mi><mo stretchy="false">(</mo><mi>h</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathcal{O}(h)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">h</span><span class="mclose">)</span></span></span></span> 啦~</p>
+<h3 id="第一章：Treap">第一章：Treap</h3>
+<p>著名恒等式：Treap = Tree + Heap</p>
+<p>很明显，刚才的 BST 在毒瘤出题人构造了一组有序数据的情况下就退化为一条链了，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">O</mi><mo stretchy="false">(</mo><mi>log</mi><mo>⁡</mo><mi>n</mi><mo stretchy="false">)</mo><mo>→</mo><mi mathvariant="script">O</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathcal{O}(\log n)\to\mathcal{O}(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>，很可怕吗，是的，很可怕。</p>
+<p>而我们的 Treap 就是加入了一个节点优先级，让这个优先级满足堆性质，然后维护的数据满足 BST 性质，这个优先级是随机给出的，这样，这棵树就是基本平衡的了。</p>
+<p>我们盗一张 <a target="_blank" rel="noopener" href="https://oi-wiki.org/ds/treap/">OI-Wiki</a> 的图：</p>
+<div style="text-align: center;">
+    <img src="https://oi-wiki.org/ds/images/treap-treap-example.svg" width="400">
+</div>
+<p>而 Treap 上的节点深度是期望 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="script">O</mi><mo stretchy="false">(</mo><mi>log</mi><mo>⁡</mo><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\mathcal{O}(\log n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathcal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span> 的，证明十分困难，说不定以后会补上（</p>
+<h4 id="旋转-Rotate">旋转 Rotate</h4>
+<p>当你插入一个新的节点后，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>v</mi><mi>a</mi><mi>l</mi></mrow><annotation encoding="application/x-tex">val</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mord mathnormal">a</span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span></span></span></span> 自然是满足 BST 的，但是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mi>r</mi><mi>i</mi><mi>o</mi><mi>r</mi><mi>i</mi><mi>t</mi><mi>y</mi></mrow><annotation encoding="application/x-tex">priority</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.02778em;">or</span><span class="mord mathnormal">i</span><span class="mord mathnormal">t</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span></span></span></span> 可能会破坏堆的性质，这时候就要引出一个十分重要的操作：<strong>旋转</strong>。</p>
+<p>旋转分左旋（zag）和右旋（zig），如左旋，就是将右子节点提到父节点的位置，并且保证 BST 的中序遍历不会改变。</p>
+<div style="text-align: center;">
+    <img src="https://cdn.luogu.com.cn/upload/pic/44303.png" width="400">
+</div>
+<p>注意图中的 E 左旋后移交给了 B 节点，这是保证这是二叉树的重要逻辑，在代码中的第三行有体现。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">rotate</span><span class="params">(<span class="type">int</span> &amp;x, <span class="type">int</span> dir)</span> </span>&#123; <span class="comment">// dir 为 0 为左旋，为 1 为右旋</span></span><br><span class="line">    <span class="type">int</span> t = tree[x].ch[!dir]; <span class="comment">// 新的 root</span></span><br><span class="line">    tree[x].ch[!dir] = tree[t].ch[dir]; <span class="comment">// 移交儿子</span></span><br><span class="line">    tree[t].ch[dir] = x; <span class="comment">// 你（t）成 爹 了</span></span><br><span class="line">    <span class="built_in">push_up</span>(x), <span class="built_in">push_up</span>(t); x = t;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="其他操作-Other-Operate">其他操作 Other Operate</h4>
+<p>假设维护大根堆。</p>
+<p>对于插入，我们只需要在刚才 BST 的板子的最后上加上一句：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(tree[tree[x].ch[dir]].pri &gt; tree[x].pri) <span class="built_in">rotate</span>(x, !dir); <span class="comment">// 维护堆性质</span></span><br></pre></td></tr></table></figure>
+<p>即可。</p>
+<p>对于删除，我们直接把要删的节点转到叶子上，然后直接删除就可以了，只需要更改如果有两个儿子的逻辑。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (tree[tree[x].ch[<span class="number">0</span>]].pri &gt; tree[tree[x].ch[<span class="number">1</span>]].pri) &#123; <span class="comment">// 左子节点的优先级大于右子节点</span></span><br><span class="line">    <span class="built_in">rotate</span>(x, <span class="number">1</span>); <span class="comment">// 把左子节点转上来（右旋）</span></span><br><span class="line">    <span class="built_in">remove</span>(tree[x].ch[<span class="number">1</span>], v); <span class="comment">// 去右子树删</span></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">rotate</span>(x, <span class="number">0</span>); <span class="comment">// 同上</span></span><br><span class="line">    <span class="built_in">remove</span>(tree[x].ch[<span class="number">0</span>], v);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以优雅化：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> dir = (tree[tree[x].ch[<span class="number">0</span>]].pri &gt; tree[tree[x].ch[<span class="number">1</span>]].pri);</span><br><span class="line"><span class="built_in">rotate</span>(x, dir); <span class="built_in">remove</span>(tree[x].ch[dir], v);</span><br></pre></td></tr></table></figure>
+<p>而查询排名、查询数值、前驱/后继这类操作是只读操作，也无需维护堆性质，因此无需旋转，所以直接用 BST 的板子就行了。</p>
+<h4 id="代码-总结-Code">代码/总结 Code</h4>
+<p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P3369">全谷最伟大的板子</a></p>
+<p>那全部代码在哪呢，赶快全部端上来罢（喜</p>
+<details>
+<summary>参考代码</summary>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="type">int</span> MAXN = <span class="number">1e5</span> + <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">Node</span> &#123;</span><br><span class="line">    <span class="type">int</span> val, cnt, sz;</span><br><span class="line">    <span class="type">int</span> ch[<span class="number">2</span>], pri;</span><br><span class="line">    <span class="function"><span class="type">void</span> <span class="title">init</span><span class="params">(<span class="type">int</span> v)</span> </span>&#123;</span><br><span class="line">        val = v, cnt = sz = <span class="number">1</span>;</span><br><span class="line">        ch[<span class="number">0</span>] = ch[<span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line">        pri = <span class="built_in">rand</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;tree[MAXN];</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> tot, rt;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">push_up</span><span class="params">(<span class="type">int</span> id)</span> </span>&#123;</span><br><span class="line">    tree[id].sz = tree[tree[id].ch[<span class="number">0</span>]].sz + </span><br><span class="line">      tree[tree[id].ch[<span class="number">1</span>]].sz + tree[id].cnt;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">rotate</span><span class="params">(<span class="type">int</span> &amp;x, <span class="type">int</span> dir)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> t = tree[x].ch[!dir];</span><br><span class="line">    tree[x].ch[!dir] = tree[t].ch[dir];</span><br><span class="line">    tree[t].ch[dir] = x;</span><br><span class="line">    <span class="built_in">push_up</span>(x), <span class="built_in">push_up</span>(t); x = t;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">insert</span><span class="params">(<span class="type">int</span> &amp;x, <span class="type">int</span> v)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!x) &#123;</span><br><span class="line">        x = ++ tot;</span><br><span class="line">        tree[x].<span class="built_in">init</span>(v);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    tree[x].sz ++;</span><br><span class="line">    <span class="keyword">if</span> (tree[x].val == v) &#123;</span><br><span class="line">        tree[x].cnt ++;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">int</span> dir = (v &gt; tree[x].val);</span><br><span class="line">    <span class="built_in">insert</span>(tree[x].ch[dir], v);</span><br><span class="line">    <span class="keyword">if</span>(tree[tree[x].ch[dir]].pri &gt; tree[x].pri) <span class="built_in">rotate</span>(x, !dir);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">remove</span><span class="params">(<span class="type">int</span> &amp;x, <span class="type">int</span> v)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!x) <span class="keyword">return</span>;</span><br><span class="line">    <span class="keyword">if</span> (tree[x].val == v) &#123;</span><br><span class="line">        <span class="keyword">if</span> (tree[x].cnt &gt; <span class="number">1</span>) &#123;</span><br><span class="line">            tree[x].cnt -- ;</span><br><span class="line">            tree[x].sz --;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (!tree[x].ch[<span class="number">0</span>] || !tree[x].ch[<span class="number">1</span>]) &#123;</span><br><span class="line">            x = tree[x].ch[<span class="number">0</span>] + tree[x].ch[<span class="number">1</span>];</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="type">int</span> dir = (tree[tree[x].ch[<span class="number">0</span>]].pri &gt; tree[tree[x].ch[<span class="number">1</span>]].pri);</span><br><span class="line">            <span class="built_in">rotate</span>(x, dir);</span><br><span class="line">            <span class="built_in">remove</span>(tree[x].ch[dir], v);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="built_in">remove</span>(tree[x].ch[v &gt; tree[x].val], v);</span><br><span class="line">    <span class="keyword">if</span>(x) <span class="built_in">push_up</span>(x);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">queryRank</span><span class="params">(<span class="type">int</span> &amp;x, <span class="type">int</span> v)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!x) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span> (tree[x].val == v) <span class="keyword">return</span> (tree[x].ch[<span class="number">0</span>] ? tree[tree[x].ch[<span class="number">0</span>]].sz : <span class="number">0</span>) + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span> (v &lt; tree[x].val) <span class="keyword">return</span> <span class="built_in">queryRank</span>(tree[x].ch[<span class="number">0</span>], v);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">return</span> <span class="built_in">queryRank</span>(tree[x].ch[<span class="number">1</span>], v) +</span><br><span class="line">      (tree[x].ch[<span class="number">0</span>] ? tree[tree[x].ch[<span class="number">0</span>]].sz : <span class="number">0</span>) + tree[x].cnt;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">queryKth</span><span class="params">(<span class="type">int</span> &amp;x, <span class="type">int</span> k)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!x) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    <span class="type">int</span> lsz = (tree[x].ch[<span class="number">0</span>] ? tree[tree[x].ch[<span class="number">0</span>]].sz : <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">if</span> (k &lt;= lsz) <span class="keyword">return</span> <span class="built_in">queryKth</span>(tree[x].ch[<span class="number">0</span>], k);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (k &lt;= lsz + tree[x].cnt) <span class="keyword">return</span> tree[x].val;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">return</span> <span class="built_in">queryKth</span>(tree[x].ch[<span class="number">1</span>], k - lsz - tree[x].cnt);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">pre</span><span class="params">(<span class="type">int</span> &amp;rt, <span class="type">int</span> v)</span> </span>&#123;<span class="keyword">return</span> <span class="built_in">queryKth</span>(rt, <span class="built_in">queryRank</span>(rt, v) - <span class="number">1</span>);&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">nxt</span><span class="params">(<span class="type">int</span> &amp;rt, <span class="type">int</span> v)</span> </span>&#123;<span class="keyword">return</span> <span class="built_in">queryKth</span>(rt, <span class="built_in">queryRank</span>(rt, v + <span class="number">1</span>));&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> n;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">signed</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">srand</span>(<span class="built_in">time</span>(<span class="number">0</span>));</span><br><span class="line">    ios::<span class="built_in">sync_with_stdio</span>(<span class="number">0</span>);</span><br><span class="line">    cin.<span class="built_in">tie</span>(<span class="number">0</span>);</span><br><span class="line">    <span class="built_in">insert</span>(rt, <span class="number">-2e9</span>); <span class="built_in">insert</span>(rt, <span class="number">2e9</span>); <span class="comment">// 哨兵，别搞</span></span><br><span class="line">    cin &gt;&gt; n;</span><br><span class="line">    <span class="keyword">while</span> (n--) &#123;</span><br><span class="line">        <span class="type">int</span> opt, x;</span><br><span class="line">        cin &gt;&gt; opt &gt;&gt; x;</span><br><span class="line">        <span class="keyword">if</span> (opt == <span class="number">1</span>) <span class="built_in">insert</span>(rt, x);</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (opt == <span class="number">2</span>) <span class="built_in">remove</span>(rt, x);</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (opt == <span class="number">3</span>) cout &lt;&lt; <span class="built_in">queryRank</span>(rt, x) - <span class="number">1</span>&lt;&lt; <span class="string">&#x27;\n&#x27;</span>; <span class="comment">// 加哨兵了就忒减掉</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (opt == <span class="number">4</span>) cout &lt;&lt; <span class="built_in">queryKth</span>(rt, x + <span class="number">1</span>) &lt;&lt; <span class="string">&#x27;\n&#x27;</span>; <span class="comment">// 同上</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (opt == <span class="number">5</span>) cout &lt;&lt; <span class="built_in">pre</span>(rt, x) &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (opt == <span class="number">6</span>) cout &lt;&lt; <span class="built_in">nxt</span>(rt, x) &lt;&lt; <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</details>
+<h3 id="第二章：FHQ-Treap">第二章：FHQ-Treap</h3>
+<p>Treap就必须要旋转吗，范浩强可不这样认为。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"><i class="fa fa-tag"></i> 笔记</a>
+              <a href="/tags/%E5%B9%B3%E8%A1%A1%E6%A0%91/" rel="tag"><i class="fa fa-tag"></i> 平衡树</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2026/01/23/Luogu%20P4592%20Record/" rel="prev" title="Luogu P4592 Record">
+      <i class="fa fa-chevron-left"></i> Luogu P4592 Record
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%95%E5%AD%90%EF%BC%9A%E4%BA%8C%E5%8F%89%E6%9F%A5%E6%89%BE%E6%A0%91"><span class="nav-number">1.</span> <span class="nav-text">引子：二叉查找树</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%EF%BC%88insert%EF%BC%89"><span class="nav-number">1.1.</span> <span class="nav-text">插入（insert）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%EF%BC%88remove%EF%BC%89"><span class="nav-number">1.2.</span> <span class="nav-text">删除（remove）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E6%8E%92%E5%90%8D%EF%BC%88rank%EF%BC%89"><span class="nav-number">1.3.</span> <span class="nav-text">查询排名（rank）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E6%95%B0%E5%80%BC%EF%BC%88K-th%EF%BC%89"><span class="nav-number">1.4.</span> <span class="nav-text">查询数值（K-th）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%89%8D%E9%A9%B1-%E5%90%8E%E7%BB%A7%EF%BC%88prev-next%EF%BC%89"><span class="nav-number">1.5.</span> <span class="nav-text">前驱&#x2F;后继（prev&#x2F;next）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E7%AB%A0%EF%BC%9ATreap"><span class="nav-number">2.</span> <span class="nav-text">第一章：Treap</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%97%8B%E8%BD%AC-Rotate"><span class="nav-number">2.1.</span> <span class="nav-text">旋转 Rotate</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E6%93%8D%E4%BD%9C-Other-Operate"><span class="nav-number">2.2.</span> <span class="nav-text">其他操作 Other Operate</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81-%E6%80%BB%E7%BB%93-Code"><span class="nav-number">2.3.</span> <span class="nav-text">代码&#x2F;总结 Code</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E7%AB%A0%EF%BC%9AFHQ-Treap"><span class="nav-number">3.</span> <span class="nav-text">第二章：FHQ-Treap</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">yang_cm</p>
+  <div class="site-description" itemprop="description">Some note for OI</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">yang_cm</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@0/dist/katex.min.css">
+  <script src="//cdn.jsdelivr.net/npm/katex@0/dist/contrib/copy-tex.min.js"></script>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@0/dist/contrib/copy-tex.min.css">
+
+
+  
+
+</body>
+</html>
